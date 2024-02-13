@@ -1,0 +1,22 @@
+{% extends 'components/navbar.html' %}
+
+{% block content %}
+<body>
+    <h1>
+        Post list
+    </h1>
+
+    {% for post in posts %}
+        <div class="card" style="width: 18rem;">
+            <img src="{{ post.image }}" class="card-img-top" alt="...">
+            <div class="card-body">
+            <h5 class="card-title">{{ post.title }} {{ post.rate }}</h5>
+            <p class="card-text">{{ post.created_at }}</p>
+            <a href="#" class="btn btn-primary">View</a>
+            </div>
+        </div>
+    {% endfor %}
+</body>
+</html>
+
+{% endblock %}

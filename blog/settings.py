@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-qxoxzs729uqg^%m!w9h@$!1w8@gh)&##7cc%ysraha&5&1q6vi
 DEBUG = True
 
 # ALLOWED_HOSTS - список хостов, которые могут обращаться к проекту
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Installed apps - список установленных приложений
