@@ -9,6 +9,8 @@ DELETE - удаление данных
 
 QuerySet - набор данных, полученных в результате запроса к базе данных
 
+FBV - Function Based View - представление, основанное на функциях
+CBV - Class Based View - представление, основанное на классах
 '''
 import random
 
@@ -42,3 +44,22 @@ def post_list_view(request):
             template_name='post/post_list.html',
             context=context
             )
+    
+
+def post_detail_view(request, post_id):
+    if request.method == 'GET':
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return render(
+                request=request,
+                template_name='errors/404.html'
+            )
+
+        context = {'post': post}
+
+        return render(
+            request=request,
+            template_name='post/post_detail.html',
+            context=context
+        )
