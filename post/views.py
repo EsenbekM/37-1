@@ -33,7 +33,9 @@ def main_view(request):
 def post_list_view(request):
     if request.method == 'GET':
         # 1. Получение всех постов
-        posts = Post.objects.all() # QuerySet (SELECT * FROM post_post)
+        posts = Post.objects.all() \
+            .prefetch_related('tags') \
+                .select_related('category') # QuerySet (SELECT * FROM post_post)
 
         # 2. Формирование контекста
         context = {'posts': posts}

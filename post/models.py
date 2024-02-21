@@ -5,6 +5,12 @@ models.py - файл, содержащий описание моделей пр�
 from django.db import models
 
 
+class Category(models.Model):
+    title = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.title
+
 class Tag(models.Model):
     title = models.CharField(max_length=50)
 
@@ -13,7 +19,13 @@ class Tag(models.Model):
 
 
 class Post(models.Model): 
-    image = models.ImageField(upload_to='post_images/%Y/%m/%d', null=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='posts'
+    )
+    image = models.ImageField(upload_to='post_images/%Y/%m/%d', null=True, blank=True)
     title = models.CharField(max_length=100)
     content = models.TextField(null=True, blank=True)
     rate = models.IntegerField(default=0)
@@ -45,8 +57,8 @@ class Post(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(
         Post,
-        on_delete=models.CASCADE,
-        related_name='comments'
+        on_delete=models.CASCADE, # SET_NULL, SET_DEFAULT, DO_NOTHING, PROTECT
+        related_name='comments' # default: comment_set
     )
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

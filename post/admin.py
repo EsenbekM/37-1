@@ -4,10 +4,11 @@ admin.py - файл, содержащий описание администра�
 
 from django.contrib import admin
 
-from post.models import Post, Comment, Tag
+from post.models import Post, Comment, Tag, Category
 
 
 # admin.site.register(Post)
+admin.site.register(Category)
 
 class CommentInline(admin.StackedInline):
     model = Comment
@@ -16,13 +17,13 @@ class CommentInline(admin.StackedInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'rate', 'created_at')
+    list_display = ('id', 'title', 'rate', 'created_at', 'category')
     list_display_links = ('title',)
-    list_editable = ('rate',)
+    list_editable = ('rate', 'category')
     list_filter = ('created_at', 'rate')
     search_fields = ('title', 'content')
     readonly_fields = ('id', 'created_at', 'updated_at', 'title')
-    fields = ('id', 'title', 'content', 'rate', 'created_at', 'updated_at')
+    fields = ('id', 'image', 'title', 'content', 'rate', 'category', 'created_at', 'updated_at')
     inlines = [CommentInline]
 
     # def get_readonly_fields(self, request, obj=None):

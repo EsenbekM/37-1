@@ -11,3 +11,6 @@ db.sqlite3
 
 # Файлы окружения
 .env
+
+static_files/
+media/

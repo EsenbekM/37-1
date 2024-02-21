@@ -1,10 +1,18 @@
 {% extends 'components/navbar.html' %}
 
+{% load static %}
+
 {% block content %}
 <body>
     <h1>
         Post Detail
     </h1>
+
+{% if post.image %}
+    <img src="/media/{{ post.image }}" >
+{% else %}
+    <img src="{% static 'empty.jpg' %}">
+{% endif %}
 
 <h1>
     {{ post.title }} {{ post.rate }}
