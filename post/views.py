@@ -14,10 +14,11 @@ CBV - Class Based View - представление, основанное на �
 '''
 import random
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 from post.models import Post
+from post.forms import PostForm, PostForm2, CommentForm
 
 
 def test_view(request):
@@ -57,11 +58,57 @@ def post_detail_view(request, post_id):
                 request=request,
                 template_name='errors/404.html'
             )
-
-        context = {'post': post}
+        form = CommentForm()
+        context = {'post': post, 'form': form}
 
         return render(
             request=request,
             template_name='post/post_detail.html',
             context=context
         )
+    
+
+def create_comment_view(request, post_id):
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if not form.is_valid():
+            return render(
+                request=request,
+                template_name='post/post_detail.html',
+                context={'form': form}
+            )
+        
+        # form.save() - попробует сохранить в базу данных 'text'
+
+        comment = form.save(commit=False) # commit=False - не сохранять в базу данных
+        # comment.text = "Some text"
+        comment.post_id = post_id
+        # comment.post_id = 3
+        comment.save()
+
+        return redirect(f'/posts/{post_id}/')
+
+
+def create_post_view(request):
+    if request.method == 'GET':
+        form = PostForm2()
+
+        return render(
+            request=request,
+            template_name='post/create_post.html',
+            context={"form": form}
+        )
+    elif request.method == 'POST':
+        form = PostForm2(request.POST, request.FILES)
+        # form.add_error(field=None, error='Some error')
+        if not form.is_valid():
+            return render(
+                request=request,
+                template_name='post/create_post.html',
+                context={"form": form}
+            )
+        # request.POST 
+        # Post.objects.create(**form.cleaned_data)
+        form.save()
+        return redirect('/posts/')
+    

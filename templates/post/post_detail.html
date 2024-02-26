@@ -45,6 +45,13 @@
 
 </div>
 
+<form action="/posts/{{ post.id }}/create_comment/" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Comment</button>
+</form>
+
+
 <style>
     .container {
         margin-top: 20px;
