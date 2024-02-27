@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
     # my apps
     'post', # Приложение для работы с постами
+    'user', # Приложение для работы с пользователями
 ]
 
 # Middleware - список промежуточных слоев
@@ -136,6 +137,13 @@ MEDIA_ROOT = BASE_DIR / 'media' # Путь к директории, куда б�
 # DEFAULT_AUTO_FIELD - настройка для автоматического создания первичных ключей
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_HOST_USER="esenbekm03@gmail.com"
+EMAIL_HOST_PASSWORD="ystiozxufxjfpuam"
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
 
 JAZZMIN_SETTINGS = {
     "site_title": "37-1 Blog",
