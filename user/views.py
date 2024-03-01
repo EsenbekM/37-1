@@ -68,6 +68,7 @@ def confirm_view(request):
 
         return redirect('main_view')
 
+
 def login_view(request):
     if request.method == 'GET':
         form = LoginForm()

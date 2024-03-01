@@ -8,6 +8,5 @@ dct = {
     'b': 5
 }
 
-print(
-    sum(**dct)
-)
+x = dct.get('h', 'No such key')
+print(x)

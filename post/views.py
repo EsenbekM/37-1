@@ -16,8 +16,9 @@ import random
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.db.models import Q
 
-from post.models import Post
+from post.models import Post, Tag
 from post.forms import PostForm, PostForm2, CommentForm
 
 
@@ -34,12 +35,97 @@ def main_view(request):
 def post_list_view(request):
     if request.method == 'GET':
         # 1. Получение всех постов
+        search = request.GET.get('search')
+        tag_id = request.GET.get('tag')
+        sort = request.GET.get('sort')
+        page = request.GET.get('page', 1)
+
+        tags = Tag.objects.all()
         posts = Post.objects.all() \
             .prefetch_related('tags') \
                 .select_related('category') # QuerySet (SELECT * FROM post_post)
 
+        if search:
+            # posts = posts.filter(title__icontains=search) | posts.filter(content__icontains=search)
+            posts = posts.filter(
+                Q(title__icontains=search) | 
+                Q(content__icontains=search)
+                # Q(tags__name__icontains=search)
+            )
+        if tag_id:
+            posts = posts.filter(tags=tag_id)
+
+        if sort == 'rate':
+            order = request.GET.get('order')
+            if order == 'asc':
+                posts = posts.order_by('rate')
+            else:
+                posts = posts.order_by('-rate')
+        elif sort == 'created_at':
+            order = request.GET.get('order')
+            if order == 'asc':
+                posts = posts.order_by('created_at')
+            else:
+                posts = posts.order_by('-created_at')
+
+        # icontains - case insensitive contains
+        # contains - case sensitive contains
+        # iexact - case insensitive exact
+        # exact - case sensitive exact
+        # startswith - начинается с
+        # endswith - заканчивается на
+        # in - входит в список
+        # gt - больше чем
+        # gte - больше или равно
+        # lt - меньше чем
+        # lte - меньше или равно
+        # range - входит в диапазон
+        # isnull - равно null
+        # regex - регулярное выражение
+        # Docs: https://docs.djangoproject.com/en/3.2/ref/models/querysets/#field-lookups
+
+
+        'posts = [post1, post2, post3, post4, post5, post6, post7, post8, post9, post10]'
+        'limit = 3, page = 1'
+        'max_pages = 10 / 3 = 3.3333 => 4'
+
+        'formula:'
+        'start = (page - 1) * limit'
+        'end = start + limit'
+
+        'example:'
+        'page = 1, limit = 3'
+        'start = (1 - 1) * 3 = 0'
+        'end = 0 + 3 = 3'
+
+        'page = 2, limit = 3'
+        'start = (2 - 1) * 3 = 3'
+        'end = 3 + 3 = 6'
+
+        'page = 4, limit = 3'
+        'start = (4 - 1) * 3 = 9'
+        'end = 9 + 3 = 12'
+
+        limit = 20
+        max_pages = posts.count() / limit
+        if max_pages % 1 != 0:
+            max_pages = int(max_pages) + 1
+            
+        pages = [i for i in range(1, max_pages + 1)]
+    
+        # if len(pages) > 10:
+        #     pages = pages[:10] + [max_pages + 1]
+
+        start = (int(page) - 1) * limit
+        end = start + limit
+
+        posts = posts[start:end]
+
         # 2. Формирование контекста
-        context = {'posts': posts}
+        context = {
+            'posts': posts, 'tags': tags,
+            "pages": pages
+            }
 
         # 3. Отображение шаблона
         return render(
