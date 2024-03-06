@@ -17,13 +17,13 @@ class CommentInline(admin.StackedInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'rate', 'created_at', 'category')
+    list_display = ('id', 'title', 'user', 'rate', 'created_at', 'category')
     list_display_links = ('title',)
     list_editable = ('rate', 'category')
     list_filter = ('created_at', 'rate')
     search_fields = ('title', 'content')
     readonly_fields = ('id', 'created_at', 'updated_at', 'title')
-    fields = ('id', 'image', 'title', 'content', 'rate', 'category', 'created_at', 'updated_at')
+    fields = ('id', 'user', 'image', 'title', 'content', 'rate', 'category', 'created_at', 'updated_at')
     inlines = [CommentInline]
 
     # def get_readonly_fields(self, request, obj=None):

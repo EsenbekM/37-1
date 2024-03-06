@@ -20,11 +20,12 @@ class Tag(models.Model):
 
 
 class Post(models.Model): 
-    # user = models.ForeignKey(
-    #     'auth.User',
-    #     on_delete=models.CASCADE,
-    #     related_name='posts'
-    # )
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        related_name='posts',
+        null=True
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,

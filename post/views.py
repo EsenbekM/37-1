@@ -13,10 +13,15 @@ FBV - Function Based View - представление, основанное н�
 CBV - Class Based View - представление, основанное на классах
 '''
 import random
+from django.db.models.query import QuerySet
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.views import View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+# from django.urls import reverse
 
 from post.models import Post, Tag
 from post.forms import PostForm, PostForm2, CommentForm
@@ -27,9 +32,39 @@ def test_view(request):
     return HttpResponse(f'Hello, world! {rn}')
 
 
+class TestView(View):
+    def get(self, request):
+        rn = random.randint(1, 1000)
+        return HttpResponse(f'Hello, world! {rn}')
+
+
 def main_view(request):
     if request.method == 'GET':
         return render(request, 'index.html')
+
+
+class PostListView(ListView):
+    model = Post
+    context_object_name = 'posts' # default: 'object_list'
+    template_name = 'post/list.html' # default: '<app>/<model>_list.html'
+    # context = {'object_list': Post.objects.all()}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tags'] = Tag.objects.all()
+
+        return context
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.GET.get('search')    
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | 
+                Q(content__icontains=search)
+            )
+        return queryset
 
 
 def post_list_view(request):
@@ -130,10 +165,18 @@ def post_list_view(request):
         # 3. Отображение шаблона
         return render(
             request=request, 
-            template_name='post/post_list.html',
+            template_name='post/list.html',
             context=context
             )
     
+
+class PostDetailView(DetailView):
+    model = Post
+    context_object_name = 'post'
+    template_name = 'post/post_detail.html'
+    pk_url_kwarg = 'post_id'
+
+
 
 def post_detail_view(request, post_id):
     if request.method == 'GET':
@@ -175,6 +218,13 @@ def create_comment_view(request, post_id):
         return redirect(f'/posts/{post_id}/')
 
 
+class PostCreateView(CreateView):
+    model = Post
+    form_class = PostForm2
+    template_name = 'post/create_post.html'
+    success_url = '/posts/'
+
+
 def create_post_view(request):
     if request.method == 'GET':
         form = PostForm2()
@@ -198,3 +248,30 @@ def create_post_view(request):
         form.save()
         return redirect('/posts/')
     
+
+@login_required(login_url='/login/')
+def update_post_view(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return render(
+            request=request,
+            template_name='errors/404.html'
+        )
+    if request.method == 'GET':
+        form = PostForm2(instance=post)
+        return render(
+            request=request,
+            template_name='post/update_post.html',
+            context={"form": form}
+        )
+    elif request.method == 'POST':
+        form = PostForm2(request.POST, request.FILES, instance=post)
+        if not form.is_valid():
+            return render(
+                request=request,
+                template_name='post/update_post.html',
+                context={"form": form}
+            )
+        form.save()
+        return redirect(f'/posts/{post_id}/')

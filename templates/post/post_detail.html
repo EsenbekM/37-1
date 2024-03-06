@@ -24,6 +24,10 @@
     {{ post.created_at }}
 </p>
 
+{% if request.user == post.user %}
+    Update: <a href="/posts/{{ post.id }}/update/">Update</a>
+{% endif %}
+
 {% for tag in post.tags.all %}
     <a href="#" class="btn btn-secondary">#{{ tag.title }}</a>
 {% endfor %}

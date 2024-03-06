@@ -1,4 +1,5 @@
 {% extends 'components/navbar.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -23,6 +24,25 @@
 <p>
     {{ user.profile.bio }}
 </p>
+
+{% for post in request.user.posts.all %}
+    <div class="card" style="width: 18rem;">
+        {% if post.image %}
+            <img src="/media/{{ post.image }}" class="card-img-top" alt="...">
+        {% else %}
+            <img src="{% static 'empty.jpg' %}" class="card-img-top" alt="...">
+        {% endif %}
+        <div class="card-body">
+        <h5 class="card-title">{{ post.title }} {{ post.rate }}</h5>
+        <p class="card-text">{{ post.created_at }}</p>
+        {% for tag in post.tags.all %}
+            <a href="#" class="btn btn-secondary">#{{ tag.title }}</a>
+        {% endfor %}
+        <a href="#" class="btn btn-secondary">#{{ post.category }}</a>
+        <a href="/posts/{{ post.id }}/" class="btn btn-primary">View</a>
+        </div>
+    </div>
+{% endfor %}
 
 <p>
     <a href="/logout/">Logout</a>
